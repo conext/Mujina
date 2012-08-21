@@ -14,30 +14,8 @@
  * limitations under the License.
  */
 
-package nl.surfnet.mujina.model;
+package nl.surfnet.mujina.utils;
 
-import java.security.KeyStore;
-import java.util.Map;
-
-public interface CommonConfiguration {
-    void reset();
-
-    KeyStore getKeyStore();
-
-    String getEntityID();
-
-    void setEntityID(String value);
-
-    void injectCredential(String certificate, String key);
-
-    Boolean getDisableSignature();
-    Boolean getDisableSignatureReference();
-
-    void setDisableSignature();
-
-    void setDisableSignatureReference();
-
-    void setXswConfiguration(String configuration);
-
-    Map<String, String> getPrivateKeyPasswords();
+public interface SamlAssemblerStrategy {
+    public SamlAssemblerStrategy add(SamlAssemblerStrategy element);
 }

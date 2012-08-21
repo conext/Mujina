@@ -20,7 +20,10 @@ package nl.surfnet.mujina.saml.xml;
 import java.util.HashMap;
 import java.util.Map;
 
+import nl.surfnet.mujina.model.*;
+import nl.surfnet.mujina.saml.AssertionImpl;
 import org.joda.time.DateTime;
+import org.opensaml.common.xml.SAMLConstants;
 import org.opensaml.saml2.core.Assertion;
 import org.opensaml.saml2.core.AuthnStatement;
 import org.opensaml.saml2.core.Issuer;
@@ -34,11 +37,10 @@ import org.opensaml.xml.signature.SignatureConstants;
 import org.opensaml.xml.signature.SignatureException;
 import org.opensaml.xml.signature.Signer;
 
-import nl.surfnet.mujina.model.AuthenticationMethod;
-import nl.surfnet.mujina.model.IdpConfiguration;
-import nl.surfnet.mujina.model.SimpleAuthentication;
 import nl.surfnet.mujina.util.IDService;
 import nl.surfnet.mujina.util.TimeService;
+
+import javax.xml.namespace.QName;
 
 public class AssertionGenerator {
 
@@ -63,15 +65,24 @@ public class AssertionGenerator {
         subjectGenerator = new SubjectGenerator(timeService);
     }
 
-    public Assertion generateAssertion(String remoteIP, SimpleAuthentication authToken, String recepientAssertionConsumerURL, int validForInSeconds, String inResponseTo, DateTime authnInstant) {
+    public Assertion generateAssertion(String remoteIP,
+                                       SimpleAuthentication authToken,
+                                       String recipientAssertionConsumerURL,
+                                       int validForInSeconds,
+                                       String inResponseTo,
+                                       DateTime authnInstant) {
         // org.apache.xml.security.utils.ElementProxy.setDefaultPrefix(namespaceURI, prefix).
 
+        Assertion assertion = new AssertionImpl(
+            SAMLConstants.SAML20_NS,
+            Assertion.DEFAULT_ELEMENT_LOCAL_NAME,
+            SAMLConstants.SAML20_PREFIX,
+            this.idpConfiguration
+        );
 
-
-        AssertionBuilder assertionBuilder = (AssertionBuilder) builderFactory.getBuilder(Assertion.DEFAULT_ELEMENT_NAME);
-        Assertion assertion = assertionBuilder.buildObject();
-
-        Subject subject = subjectGenerator.generateSubject(recepientAssertionConsumerURL, validForInSeconds, authToken.getName(), inResponseTo, remoteIP);
+        Subject subject = subjectGenerator.generateSubject(
+            recipientAssertionConsumerURL,
+            validForInSeconds, authToken.getName(), inResponseTo, remoteIP);
 
         Issuer issuer = issuerGenerator.generateIssuer();
 
@@ -96,7 +107,9 @@ public class AssertionGenerator {
         assertion.setID(idService.generateID());
         assertion.setIssueInstant(timeService.getCurrentDateTime());
 
-        signAssertion(assertion);
+        if (!this.idpConfiguration.getDisableSignature()) {
+            signAssertion(assertion);
+        }
 
         return assertion;
     }
@@ -124,6 +137,4 @@ public class AssertionGenerator {
             e.printStackTrace();
         }
     }
-
-
 }

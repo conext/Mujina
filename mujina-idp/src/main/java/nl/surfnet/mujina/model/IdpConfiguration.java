@@ -27,4 +27,6 @@ public interface IdpConfiguration extends CommonConfiguration {
     AuthenticationMethod.Method getAuthentication();
 
     void setAuthentication(AuthenticationMethod.Method method);
+
+    public String getXswConfiguration();
 }

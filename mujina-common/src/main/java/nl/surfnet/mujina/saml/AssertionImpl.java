@@ -14,30 +14,20 @@
  * limitations under the License.
  */
 
-package nl.surfnet.mujina.model;
+package nl.surfnet.mujina.saml;
 
-import java.security.KeyStore;
-import java.util.Map;
+import nl.surfnet.mujina.model.CommonConfiguration;
 
-public interface CommonConfiguration {
-    void reset();
+public class AssertionImpl extends org.opensaml.saml2.core.impl.AssertionImpl {
+    private CommonConfiguration configuration;
 
-    KeyStore getKeyStore();
+    public AssertionImpl(String namespaceURI, String elementLocalName, String namespacePrefix, CommonConfiguration configuration) {
+        super(namespaceURI, elementLocalName, namespacePrefix);
+        this.configuration = configuration;
+    }
 
-    String getEntityID();
-
-    void setEntityID(String value);
-
-    void injectCredential(String certificate, String key);
-
-    Boolean getDisableSignature();
-    Boolean getDisableSignatureReference();
-
-    void setDisableSignature();
-
-    void setDisableSignatureReference();
-
-    void setXswConfiguration(String configuration);
-
-    Map<String, String> getPrivateKeyPasswords();
+    /** {@inheritDoc} */
+    public String getSignatureReferenceID(){
+        return this.configuration.getDisableSignatureReference() ? getID() : null;
+    }
 }

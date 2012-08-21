@@ -42,12 +42,15 @@ public abstract class CommonConfigurationImpl implements CommonConfiguration {
 
     protected KeyStore keyStore;
     protected String keystorePassword = "secret";
+    protected String entityId;
+    protected Boolean disableSignature = false;
+    protected Boolean disableSignatureReference = false;
+    protected String xswConfiguration;
 
     @Override
     public Map<String, String> getPrivateKeyPasswords() {
         return privateKeyPasswords;
     }
-    protected String entityId;
 
     protected Map<String, String> privateKeyPasswords = new HashMap<String, String>();
 
@@ -74,6 +77,33 @@ public abstract class CommonConfigurationImpl implements CommonConfiguration {
             LOGGER.warn("Unable to update signing key in key store", e);
         }
         this.entityId = newEntityId;
+    }
+
+    public Boolean getDisableSignature() {
+        return disableSignature;
+    }
+
+    @Override
+    public void setDisableSignature() {
+        this.disableSignature = true;
+    }
+
+    public Boolean getDisableSignatureReference() {
+        return disableSignatureReference;
+    }
+
+    @Override
+    public void setDisableSignatureReference() {
+        this.disableSignatureReference = true;
+    }
+
+    public String getXswConfiguration() {
+        return xswConfiguration;
+    }
+
+    @Override
+    public void setXswConfiguration(String xswConfiguration) {
+        this.xswConfiguration = xswConfiguration;
     }
 
     @Override

@@ -109,13 +109,30 @@ public class SSOSuccessAuthnResponder implements HttpRequestHandler {
         }
         Validate.notNull(signingCredential);
 
-        AuthnResponseGenerator authnResponseGenerator = new AuthnResponseGenerator(signingCredential, idpConfiguration.getEntityID(), timeService, idService, idpConfiguration);
+        AuthnResponseGenerator authnResponseGenerator = new AuthnResponseGenerator(
+            signingCredential,
+            idpConfiguration.getEntityID(),
+            timeService,
+            idService,
+            idpConfiguration
+        );
         EndpointGenerator endpointGenerator = new EndpointGenerator();
 
         final String remoteIP = request.getRemoteAddr();
 
-        Response authResponse = authnResponseGenerator.generateAuthnResponse(remoteIP, authToken, info.getAssertionConumerURL(), responseValidityTimeInSeconds, info.getAuthnRequestID(), authnInstant);
-        Endpoint endpoint = endpointGenerator.generateEndpoint(org.opensaml.saml2.metadata.AssertionConsumerService.DEFAULT_ELEMENT_NAME, info.getAssertionConumerURL(), null);
+        Response authResponse = authnResponseGenerator.generateAuthnResponse(
+            remoteIP,
+            authToken,
+            info.getAssertionConumerURL(),
+            responseValidityTimeInSeconds,
+            info.getAuthnRequestID(),
+            authnInstant
+        );
+        Endpoint endpoint = endpointGenerator.generateEndpoint(
+            org.opensaml.saml2.metadata.AssertionConsumerService.DEFAULT_ELEMENT_NAME,
+            info.getAssertionConumerURL(),
+            null
+        );
 
         request.getSession().removeAttribute(AuthnRequestInfo.class.getName());
 

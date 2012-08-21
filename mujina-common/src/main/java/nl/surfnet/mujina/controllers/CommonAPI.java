@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import nl.surfnet.mujina.model.CommonConfiguration;
 import nl.surfnet.mujina.model.Credential;
+import nl.surfnet.mujina.model.SigningConfiguration;
 import nl.surfnet.mujina.model.EntityID;
 
 @Controller
@@ -67,5 +68,24 @@ public class CommonAPI {
         configuration.injectCredential(credential.getCertificate(), credential.getKey());
     }
 
-
+    @RequestMapping(value = {"/signing"}, method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseBody
+    public void setSigningCredential(@RequestBody SigningConfiguration configuration) {
+        log.debug("Request to set signing settings");
+        String setting = configuration.getSetting();
+        if (setting.equals("NoSignature")) {
+            this.configuration.setDisableSignature();
+        }
+        else if (setting.equals("NoSignatureReference")) {
+            this.configuration.setDisableSignatureReference();
+        }
+        else if (setting.toUpperCase().startsWith("XSW:")) {
+            // @todo We don't check the syntax here...
+            this.configuration.setXswConfiguration(setting.substring(4));
+        }
+        else {
+            throw new RuntimeException("Unrecognized setting!");
+        }
+    }
 }

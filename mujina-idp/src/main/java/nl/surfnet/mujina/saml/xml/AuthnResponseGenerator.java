@@ -62,7 +62,14 @@ public class AuthnResponseGenerator {
 
         Issuer responseIssuer = issuerGenerator.generateIssuer();
 
-        Assertion assertion = assertionGenerator.generateAssertion(remoteIP, authToken, recepientAssertionConsumerURL, validForInSeconds, inResponseTo, authnInstant);
+        Assertion assertion = assertionGenerator.generateAssertion(
+            remoteIP,
+            authToken,
+            recepientAssertionConsumerURL,
+            validForInSeconds,
+            inResponseTo,
+            authnInstant
+        );
 
         authResponse.setIssuer(responseIssuer);
         authResponse.setID(idService.generateID());

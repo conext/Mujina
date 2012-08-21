@@ -42,6 +42,9 @@ public class IdpConfigurationImpl extends CommonConfigurationImpl implements Idp
 
     @Override
     public void reset() {
+        disableSignature = false;
+        disableSignatureReference = false;
+        xswConfiguration = "";
         authMethod = AuthenticationMethod.Method.USER;
         entityId = "http://mock-idp";
         attributes.clear();
@@ -94,4 +97,8 @@ public class IdpConfigurationImpl extends CommonConfigurationImpl implements Idp
         this.authMethod = method;
     }
 
+    @Override
+    public String getXswConfiguration() {
+        return xswConfiguration;
+    }
 }

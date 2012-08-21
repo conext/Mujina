@@ -29,12 +29,12 @@
 
   <bean id="timeService" class="nl.surfnet.mujina.util.TimeService"/>
   <bean id="idService" class="nl.surfnet.mujina.util.IDService"/>
-  <bean id="samlValidaotrSuite" class="nl.surfnet.mujina.saml.xml.SAML2ValidatorSuite"/>
+  <bean id="samlValidatorSuite" class="nl.surfnet.mujina.saml.xml.SAML2ValidatorSuite"/>
 
   <bean id="singleSignOnService" class="nl.surfnet.mujina.saml.SingleSignOnService">
     <constructor-arg value="${AUTHN_RESPONDER_URI}"/>
     <constructor-arg ref="bindingAdpater"/>
-    <constructor-arg ref="samlValidaotrSuite"/>
+    <constructor-arg ref="samlValidatorSuite"/>
   </bean>
 
   <bean id="authnResponder" class="nl.surfnet.mujina.saml.SSOSuccessAuthnResponder">

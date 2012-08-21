@@ -19,6 +19,7 @@ package nl.surfnet.mujina.saml;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import nl.surfnet.mujina.model.CommonConfiguration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.app.VelocityEngine;
 import org.opensaml.common.SignableSAMLObject;
@@ -38,7 +39,7 @@ import org.opensaml.xml.security.credential.Credential;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Required;
 
-import nl.surfnet.mujina.model.CommonConfiguration;
+import nl.surfnet.mujina.model.CommonConfigurationImpl;
 
 public class PostBindingAdapter implements BindingAdapter, InitializingBean {
 
@@ -48,7 +49,7 @@ public class PostBindingAdapter implements BindingAdapter, InitializingBean {
     private VelocityEngine velocityEngine;
 
     private final SAMLMessageDecoder decoder;
-    SAMLMessageEncoder encoder;
+    public SAMLMessageEncoder encoder;
     private final SecurityPolicyResolver resolver;
 
     private CommonConfiguration configuration;
@@ -118,8 +119,12 @@ public class PostBindingAdapter implements BindingAdapter, InitializingBean {
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        encoder = new HTTPPostSimpleSignEncoder(velocityEngine,
-                "/templates/saml2-post-simplesign-binding.vm", true);
+        encoder = new HTTPPostConfigurableSignEncoder(
+            velocityEngine,
+            "/templates/saml2-post-simplesign-binding.vm",
+            true,
+            configuration
+        );
     }
 
 
