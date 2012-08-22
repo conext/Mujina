@@ -156,6 +156,71 @@ curl -v -H "Accept: application/json" \
         http://localhost:8080/api/signing-credential
 ```
 
+Testing XML Signature Wrapping
+------------------------------
+
+This API is available on both the IDP and SP (although the actual XSW functionality is only useful for IDPs).
+
+Disable signature:
+
+```bash
+curl -v -H "Accept: application/json" \
+        -H "Content-type: application/json" \
+        -X POST -d "{\"setting\": \"NoSignature\"}" \
+        http://localhost:8080/api/signing
+```
+
+Disable signature Reference (Use empty Reference URI):
+
+```bash
+curl -v -H "Accept: application/json" \
+        -H "Content-type: application/json" \
+        -X POST -d "{\"setting\": \"NoSignatureReference\"}" \
+        http://localhost:8080/api/signing
+```
+
+[XML Signature Wrapping][1] configuration.
+
+Domain Specific Language with following symbols:
+<dl>
+  <dt>E</dt>
+    <dd>Evil assertion</dd>
+  <dt>A</dt>
+    <dd>Assertion</dd>
+  <dt>S</dt>
+    <dd>Signature</dd>
+</dl>
+
+Allows you to configure the position of each element like so:
+<dl>
+  <dt>EAS</dt>
+    <dd>Evil Assertion, Assertion and Signature on the same level (One Level)</dd>
+  <dt>E(A(S))</dt>
+    <dd>Signature nested in the Assertion nested in the Evil Assertion (Three levels)</dd>
+  <dt>A(S)E</dt>
+    <dd>Evil Assertion, then Assertion with nested Signature</dd>
+</dl>
+
+Note that by default the signature references the proper assertion, but with S>E you can make the signature reference the evil assertion.
+
+Examples:
+Type 1:
+```bash
+curl -v -H "Accept: application/json" \
+        -H "Content-type: application/json" \
+        -X POST -d "{\"setting\": \"XSW:SAE\"}" \
+        http://localhost:8080/api/signing
+```
+Type 2 (with signature referencing evil assertion):
+```bash
+curl -v -H "Accept: application/json" \
+        -H "Content-type: application/json" \
+        -X POST -d "{\"setting\": \"XSW:E(A(S>E))\"}" \
+        http://localhost:8080/api/signing
+```
+
+    [1]: http://www.nds.rub.de/media/nds/veroeffentlichungen/2012/08/03/BreakingSAML.pdf "Breaking SAML"
+
 Setting attribute foo to bar (e.g. urn:mace:dir:attribute-def:foo to bar)
 -------------------------------------------------------
 
