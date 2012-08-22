@@ -71,7 +71,7 @@ public class CommonAPI {
     @RequestMapping(value = {"/signing"}, method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ResponseBody
-    public void setSigningCredential(@RequestBody SigningConfiguration configuration) {
+    public void setSigning(@RequestBody SigningConfiguration configuration) {
         log.debug("Request to set signing settings");
         String setting = configuration.getSetting();
         if (setting.equals("NoSignature")) {

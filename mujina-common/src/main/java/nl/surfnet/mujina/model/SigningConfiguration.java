@@ -50,5 +50,5 @@ public class SigningConfiguration implements Serializable {
 }
 
 /**
- * { attack: "NoSignature/NoReference/XSW:EAS/E>A>S/EA>S"}
+ * { setting: "NoSignature/NoReference/XSW:EAS/E>A>S/EA>S"}
  */

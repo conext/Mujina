@@ -21,6 +21,9 @@ import java.util.Collections;
 
 import javax.servlet.ServletException;
 
+import nl.surfnet.mujina.model.*;
+import org.apache.xml.security.exceptions.XMLSecurityException;
+import org.apache.xml.security.signature.XMLSignature;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,21 +31,15 @@ import org.opensaml.saml2.core.Response;
 import org.opensaml.ws.message.encoder.MessageEncodingException;
 import org.opensaml.xml.io.UnmarshallingException;
 import org.opensaml.xml.parse.XMLParserException;
+import org.opensaml.xml.signature.impl.SignatureImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import nl.surfnet.mujina.controllers.IdentityProviderAPI;
 import nl.surfnet.mujina.controllers.CommonAPI;
-import nl.surfnet.mujina.model.Attribute;
-import nl.surfnet.mujina.model.AuthenticationMethod;
-import nl.surfnet.mujina.model.Credential;
-import nl.surfnet.mujina.model.EntityID;
-import nl.surfnet.mujina.model.User;
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.assertNotNull;
-import static junit.framework.Assert.assertTrue;
+
+import static junit.framework.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {
@@ -155,7 +152,46 @@ public class IdpRestAPITest {
         AuthenticationMethod authenticationMethod = new AuthenticationMethod();
         authenticationMethod.setValue("ALL");
         restApiController.setAuthenticationMethod(authenticationMethod);
+
         final Response response = testHelper.doSamlLogin("jaapie", "asdlkfjbdiufv");
         assertTrue(testHelper.responseHasAttribute("urn:mace:dir:attribute-def:uid", "jaapie", response));
+    }
+
+    @Test
+    public void testSetNoSignature() throws IOException, ServletException, MessageEncodingException, XMLParserException, UnmarshallingException {
+        SigningConfiguration config = new SigningConfiguration();
+        config.setSetting("NoSignature");
+        commonAPI.setSigning(config);
+
+        final Response response = testHelper.doSamlLogin(DEFAULT_USER, DEFAULT_PASSWORD);
+        assertNotNull(response);
+        assertNull(response.getAssertions().get(0).getSignature());
+    }
+
+
+    @Test
+    public void testSetNoSignatureReference() throws IOException, ServletException, MessageEncodingException, XMLParserException, XMLSecurityException, UnmarshallingException {
+        SigningConfiguration config = new SigningConfiguration();
+        config.setSetting("NoSignatureReference");
+        commonAPI.setSigning(config);
+
+        final Response response = testHelper.doSamlLogin(DEFAULT_USER, DEFAULT_PASSWORD);
+        assertNotNull(response);
+        SignatureImpl assertionSignature = (SignatureImpl) response.getAssertions().get(0).getSignature();
+        assertEquals(
+            "Assertion references empty URI",
+            "",
+            assertionSignature.getXMLSignature().getSignedInfo().item(0).getURI()
+        );
+    }
+
+    @Test
+    public void testXswLevel1() throws IOException, ServletException, MessageEncodingException, XMLParserException, XMLSecurityException, UnmarshallingException {
+        SigningConfiguration config = new SigningConfiguration();
+        config.setSetting("XSW:SEA");
+        commonAPI.setSigning(config);
+
+        final Response response = testHelper.doSamlLogin(DEFAULT_USER, DEFAULT_PASSWORD);
+        assertNotNull(response);
     }
 }

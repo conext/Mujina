@@ -28,6 +28,6 @@ public class AssertionImpl extends org.opensaml.saml2.core.impl.AssertionImpl {
 
     /** {@inheritDoc} */
     public String getSignatureReferenceID(){
-        return this.configuration.getDisableSignatureReference() ? getID() : null;
+        return this.configuration.getDisableSignatureReference() ? null : getID();
     }
 }
