@@ -1,15 +1,14 @@
 package nl.surfnet.mujina.controllers.tests;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.servlet.ServletException;
-
+import nl.surfnet.mujina.model.SimpleAuthentication;
+import nl.surfnet.mujina.saml.AuthnRequestGenerator;
+import nl.surfnet.mujina.saml.PostBindingAdapter;
+import nl.surfnet.mujina.saml.SSOSuccessAuthnResponder;
+import nl.surfnet.mujina.saml.SingleSignOnService;
+import nl.surfnet.mujina.saml.xml.EndpointGenerator;
+import nl.surfnet.mujina.spring.security.CustomAuthenticationProvider;
+import nl.surfnet.mujina.util.IDService;
+import nl.surfnet.mujina.util.TimeService;
 import org.apache.commons.codec.binary.Base64;
 import org.opensaml.Configuration;
 import org.opensaml.saml2.core.AuthnRequest;
@@ -30,15 +29,23 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import nl.surfnet.mujina.model.SimpleAuthentication;
-import nl.surfnet.mujina.saml.AuthnRequestGenerator;
-import nl.surfnet.mujina.saml.PostBindingAdapter;
-import nl.surfnet.mujina.saml.SSOSuccessAuthnResponder;
-import nl.surfnet.mujina.saml.SingleSignOnService;
-import nl.surfnet.mujina.saml.xml.EndpointGenerator;
-import nl.surfnet.mujina.spring.security.CustomAuthenticationProvider;
-import nl.surfnet.mujina.util.IDService;
-import nl.surfnet.mujina.util.TimeService;
+import javax.servlet.ServletException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
 
@@ -76,10 +83,10 @@ public class TestHelper {
     }
 
     public Response doSamlLogin(final String user, final String password) throws MessageEncodingException, ServletException, IOException, XMLParserException, UnmarshallingException {
-        final String authnRequest = createAuthnRequest();
+        String authnRequest = createAuthnRequest();
 
-        final String samlResponse = doIdpLogin(authnRequest, user, password);
-
+        String samlResponse = doIdpLogin(authnRequest, user, password);
+//System.out.println(prettyFormat(samlResponse));
         return unmarshalSamlResponse(samlResponse);
     }
 
@@ -140,5 +147,27 @@ public class TestHelper {
         matcher.find();
         String encoded = matcher.group(1);
         return new String(Base64.decodeBase64(encoded), Charset.forName("UTF-8"));
+    }
+
+    public static String prettyFormat(String input, int indent) {
+        try {
+            Source xmlInput = new StreamSource(new StringReader(input));
+            StringWriter stringWriter = new StringWriter();
+            StreamResult xmlOutput = new StreamResult(stringWriter);
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            //transformerFactory.setAttribute("indent-number", indent);
+
+            Transformer transformer = transformerFactory.newTransformer();
+            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            transformer.transform(xmlInput, xmlOutput);
+            return xmlOutput.getWriter().toString();
+        } catch (Exception e) {
+            throw new RuntimeException(e); // simple exception handling, please review it
+        }
+    }
+
+    public static String prettyFormat(String input) {
+        return prettyFormat(input, 2);
     }
 }

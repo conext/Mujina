@@ -17,30 +17,23 @@
 package nl.surfnet.mujina.saml.xml;
 
 
-import java.util.HashMap;
-import java.util.Map;
-
-import nl.surfnet.mujina.model.*;
+import nl.surfnet.mujina.model.AuthenticationMethod;
+import nl.surfnet.mujina.model.IdpConfiguration;
+import nl.surfnet.mujina.model.SimpleAuthentication;
 import nl.surfnet.mujina.saml.AssertionImpl;
+import nl.surfnet.mujina.util.IDService;
+import nl.surfnet.mujina.util.TimeService;
 import org.joda.time.DateTime;
 import org.opensaml.common.xml.SAMLConstants;
 import org.opensaml.saml2.core.Assertion;
 import org.opensaml.saml2.core.AuthnStatement;
 import org.opensaml.saml2.core.Issuer;
 import org.opensaml.saml2.core.Subject;
-import org.opensaml.saml2.core.impl.AssertionBuilder;
 import org.opensaml.xml.XMLObjectBuilderFactory;
-import org.opensaml.xml.io.MarshallingException;
 import org.opensaml.xml.security.credential.Credential;
-import org.opensaml.xml.signature.Signature;
-import org.opensaml.xml.signature.SignatureConstants;
-import org.opensaml.xml.signature.SignatureException;
-import org.opensaml.xml.signature.Signer;
 
-import nl.surfnet.mujina.util.IDService;
-import nl.surfnet.mujina.util.TimeService;
-
-import javax.xml.namespace.QName;
+import java.util.HashMap;
+import java.util.Map;
 
 public class AssertionGenerator {
 
@@ -107,34 +100,6 @@ public class AssertionGenerator {
         assertion.setID(idService.generateID());
         assertion.setIssueInstant(timeService.getCurrentDateTime());
 
-        if (!this.idpConfiguration.getDisableSignature()) {
-            signAssertion(assertion);
-        }
-
         return assertion;
-    }
-
-    private void signAssertion(final Assertion assertion) {
-
-        Signature signature = (Signature) org.opensaml.Configuration.getBuilderFactory()
-                .getBuilder(Signature.DEFAULT_ELEMENT_NAME)
-                .buildObject(Signature.DEFAULT_ELEMENT_NAME);
-
-        signature.setSigningCredential(signingCredential);
-        signature.setSignatureAlgorithm(SignatureConstants.ALGO_ID_SIGNATURE_RSA_SHA1);
-        signature.setCanonicalizationAlgorithm(SignatureConstants.ALGO_ID_C14N_EXCL_OMIT_COMMENTS);
-
-        assertion.setSignature(signature);
-
-        try {
-            org.opensaml.Configuration.getMarshallerFactory().getMarshaller(assertion).marshall(assertion);
-        } catch (MarshallingException e) {
-            e.printStackTrace();
-        }
-        try {
-            Signer.signObject(signature);
-        } catch (SignatureException e) {
-            e.printStackTrace();
-        }
     }
 }

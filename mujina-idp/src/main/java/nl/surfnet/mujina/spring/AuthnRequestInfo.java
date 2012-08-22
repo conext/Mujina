@@ -16,9 +16,9 @@
 
 package nl.surfnet.mujina.spring;
 
-import java.io.Serializable;
-
 import org.apache.commons.lang.builder.ToStringBuilder;
+
+import java.io.Serializable;
 
 public class AuthnRequestInfo implements Serializable {
 
@@ -31,10 +31,9 @@ public class AuthnRequestInfo implements Serializable {
         this.authnRequestID = authnRequestID;
     }
 
-    public String getAssertionConumerURL() {
+    public String getAssertionConsumerURL() {
         return assertionConumerURL;
     }
-
 
     public String getAuthnRequestID() {
         return authnRequestID;
@@ -49,6 +48,4 @@ public class AuthnRequestInfo implements Serializable {
 
 
     }
-
-
 }

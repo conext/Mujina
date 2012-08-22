@@ -16,18 +16,18 @@
 
 package nl.surfnet.mujina.spring;
 
-import java.io.IOException;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import nl.surfnet.mujina.model.IdpConfiguration;
+import nl.surfnet.mujina.saml.BindingAdapter;
+import nl.surfnet.mujina.saml.xml.AuthnResponseGenerator;
+import nl.surfnet.mujina.saml.xml.EndpointGenerator;
+import nl.surfnet.mujina.util.IDService;
+import nl.surfnet.mujina.util.TimeService;
 import org.apache.commons.lang.Validate;
 import org.opensaml.saml2.core.Response;
 import org.opensaml.saml2.metadata.AssertionConsumerService;
 import org.opensaml.saml2.metadata.Endpoint;
 import org.opensaml.ws.message.encoder.MessageEncodingException;
-import org.opensaml.xml.security.*;
+import org.opensaml.xml.security.CriteriaSet;
 import org.opensaml.xml.security.credential.Credential;
 import org.opensaml.xml.security.credential.CredentialResolver;
 import org.opensaml.xml.security.credential.UsageType;
@@ -40,12 +40,10 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.WebAttributes;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 
-import nl.surfnet.mujina.model.IdpConfiguration;
-import nl.surfnet.mujina.saml.BindingAdapter;
-import nl.surfnet.mujina.saml.xml.AuthnResponseGenerator;
-import nl.surfnet.mujina.saml.xml.EndpointGenerator;
-import nl.surfnet.mujina.util.IDService;
-import nl.surfnet.mujina.util.TimeService;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 public class RealAuthenticationFailureHandler implements AuthenticationFailureHandler {
 
@@ -108,11 +106,23 @@ public class RealAuthenticationFailureHandler implements AuthenticationFailureHa
         }
         Validate.notNull(signingCredential);
 
-        AuthnResponseGenerator authnResponseGenerator = new AuthnResponseGenerator(signingCredential, idpConfiguration.getEntityID(), timeService, idService, idpConfiguration);
+        AuthnResponseGenerator authnResponseGenerator = new AuthnResponseGenerator(
+            idpConfiguration.getEntityID(),
+            timeService,
+            idService
+        );
         EndpointGenerator endpointGenerator = new EndpointGenerator();
 
-        Response authResponse = authnResponseGenerator.generateAuthnResponseFailure(authnRequestInfo.getAssertionConumerURL(), authnRequestInfo.getAuthnRequestID(), authenticationException);
-        Endpoint endpoint = endpointGenerator.generateEndpoint(AssertionConsumerService.DEFAULT_ELEMENT_NAME, authnRequestInfo.getAssertionConumerURL(), null);
+        Response authResponse = authnResponseGenerator.generateAuthnResponseFailure(
+            authnRequestInfo.getAssertionConsumerURL(),
+            authnRequestInfo.getAuthnRequestID(),
+            authenticationException
+        );
+        Endpoint endpoint = endpointGenerator.generateEndpoint(
+            AssertionConsumerService.DEFAULT_ELEMENT_NAME,
+            authnRequestInfo.getAssertionConsumerURL(),
+            null
+        );
 
         request.getSession().removeAttribute(AuthnRequestInfo.class.getName());
 

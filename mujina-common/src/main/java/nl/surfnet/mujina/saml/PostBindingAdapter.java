@@ -16,9 +16,6 @@
 
 package nl.surfnet.mujina.saml;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import nl.surfnet.mujina.model.CommonConfiguration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.app.VelocityEngine;
@@ -27,7 +24,6 @@ import org.opensaml.common.binding.BasicSAMLMessageContext;
 import org.opensaml.common.binding.SAMLMessageContext;
 import org.opensaml.common.binding.decoding.SAMLMessageDecoder;
 import org.opensaml.common.binding.encoding.SAMLMessageEncoder;
-import org.opensaml.saml2.binding.encoding.HTTPPostSimpleSignEncoder;
 import org.opensaml.saml2.metadata.Endpoint;
 import org.opensaml.ws.message.decoder.MessageDecodingException;
 import org.opensaml.ws.message.encoder.MessageEncodingException;
@@ -39,7 +35,8 @@ import org.opensaml.xml.security.credential.Credential;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Required;
 
-import nl.surfnet.mujina.model.CommonConfigurationImpl;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 public class PostBindingAdapter implements BindingAdapter, InitializingBean {
 
@@ -101,6 +98,7 @@ public class PostBindingAdapter implements BindingAdapter, InitializingBean {
         messageContext.setPeerEntityEndpoint(endpoint);
         messageContext.setOutboundSAMLMessage(samlMessage);
         messageContext.setOutboundMessageIssuer(configuration.getEntityID());
+        messageContext.setOutboundSAMLMessageSigningCredential(signingCredential);
 
         encoder.encode(messageContext);
 
