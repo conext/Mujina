@@ -17,26 +17,19 @@
 package nl.surfnet.mujina.utils.tests;
 
 
-import com.sun.tools.doclets.internal.toolkit.builders.BuilderFactory;
 import nl.surfnet.mujina.utils.XswInterpreter;
 import org.apache.xml.security.signature.XMLSignature;
 import org.junit.Before;
 import org.junit.runner.RunWith;
-import org.opensaml.common.impl.SAMLObjectContentReference;
-import org.opensaml.common.xml.SAMLConstants;
+
 import org.opensaml.saml2.core.Advice;
 import org.opensaml.saml2.core.Assertion;
 import org.opensaml.saml2.core.Response;
 import org.opensaml.saml2.core.impl.AssertionMarshaller;
 import org.opensaml.saml2.core.impl.AssertionImpl;
 import org.opensaml.saml2.core.impl.ResponseBuilder;
-import org.opensaml.saml2.core.impl.ResponseImpl;
-import org.opensaml.xml.Configuration;
 import org.opensaml.xml.XMLObjectBuilderFactory;
-import org.opensaml.xml.io.Marshaller;
-import org.opensaml.xml.security.SecurityHelper;
 import org.opensaml.xml.signature.ContentReference;
-import org.opensaml.xml.signature.KeyInfo;
 import org.opensaml.xml.signature.Signature;
 import org.opensaml.xml.signature.impl.SignatureImpl;
 import org.springframework.test.context.ContextConfiguration;
@@ -44,13 +37,11 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import org.junit.Test;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertTrue;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {
