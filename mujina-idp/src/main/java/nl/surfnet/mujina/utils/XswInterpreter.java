@@ -16,12 +16,9 @@
 
 package nl.surfnet.mujina.utils;
 
-import org.apache.velocity.runtime.log.SystemLogChute;
 import org.opensaml.common.impl.SAMLObjectContentReference;
-import org.opensaml.saml2.core.Assertion;
 import org.opensaml.saml2.core.Response;
 import org.opensaml.saml2.core.impl.AssertionImpl;
-import org.opensaml.xml.signature.Signature;
 import org.opensaml.xml.signature.impl.SignatureImpl;
 
 /**
@@ -29,12 +26,12 @@ import org.opensaml.xml.signature.impl.SignatureImpl;
  *
  * Parsing Expression Grammar:
  *
- * configuration        <- element nestedElement{2}
- * nestedElement        <- ">"* element
+ * configuration        <- nestedElement+
+ * nestedElement        <- element '(' nestedElement ')' / element
  * element              <- referencedSignature / assertionElement
- * assertionElement     <- "E" / "A"
- * referencedSignature  <- "S" reference*
- * reference            <- "(" assertionElement ")"
+ * assertionElement     <- 'E' / 'A'
+ * referencedSignature  <- 'S' reference*
+ * reference            <- '>' assertionElement
  */
 public class XswInterpreter {
     private Integer position = 0;
@@ -43,7 +40,6 @@ public class XswInterpreter {
     private AssertionImpl assertion;
     private AssertionImpl evilAssertion;
     private SignatureImpl signature;
-    private SamlAssemblerStrategy parent;
 
     public XswInterpreter(String configuration,
                             Response response,
@@ -58,30 +54,34 @@ public class XswInterpreter {
     }
 
     public Response interpret() {
-        parent = new SamlAssemblerResponseStrategy(response);
-
-        SamlAssemblerStrategy element = parent.add(element());
-        element = nestedElement(element);
-        nestedElement(element);
+        SamlAssemblerResponseStrategy parent = new SamlAssemblerResponseStrategy(response);
+        // While we are not at the EndOfString
+        while (this.position < this.configuration.length()) {
+            parent.add(nestedElement());
+        }
 
         // Rewind
         position = 0;
-        parent = null;
 
         return response;
     }
 
-    public SamlAssemblerStrategy nestedElement(SamlAssemblerStrategy prevElement) {
-        if (lookAhead().equals(">")) {
-            consume(">");
-            parent = prevElement;
+    public SamlAssemblerStrategy nestedElement() {
+        SamlAssemblerStrategy element = element();
+        if (lookAhead() == null || !lookAhead().equals('(')) {
+            return element;
         }
-        return parent.add(element());
+
+        consume('(');
+        element.add(nestedElement());
+        consume(')');
+
+        return element;
     }
 
     public SamlAssemblerStrategy element() {
-        String nextToken = lookAhead();
-        if (nextToken.equals("S")) {
+        Character nextToken = lookAhead();
+        if (nextToken.equals('S')) {
             return new SamlAssemblerSignatureStrategy(referencedSignature());
         }
         else {
@@ -90,13 +90,13 @@ public class XswInterpreter {
     }
 
     public AssertionImpl assertionElement() {
-        String nextToken = lookAhead();
-        if (nextToken.equals("E")) {
-            consume("E");
+        Character nextToken = lookAhead();
+        if (nextToken.equals('E')) {
+            consume('E');
             return evilAssertion;
         }
-        else if (nextToken.equals("A")) {
-            consume("A");
+        else if (nextToken.equals('A')) {
+            consume('A');
             return assertion;
         }
         else {
@@ -112,10 +112,10 @@ public class XswInterpreter {
     }
 
     public SignatureImpl referencedSignature() {
-        consume("S");
+        consume('S');
 
         AssertionImpl assertion = this.assertion;
-        if (lookAhead().equals("(")) {
+        if (lookAhead() != null && lookAhead().equals('>')) {
             assertion = reference();
         }
         signature.getContentReferences().add(new SAMLObjectContentReference(assertion));
@@ -124,26 +124,29 @@ public class XswInterpreter {
     }
 
     public AssertionImpl reference() {
-        consume("(");
-        AssertionImpl assertion = assertionElement();
-        consume(")");
-        return assertion;
+        consume('>');
+        return assertionElement();
     }
 
-    protected String consume(String match) {
-        String token = this.configuration.substring(this.position, this.position + 1);
+    protected Character consume(Character match) {
+        Character token = this.configuration.charAt(this.position);
         if (!token.equals(match)) {
-            throw new RuntimeException("Unrecognized token " + token + " in input: " + configuration);
+            throw new RuntimeException(
+                "Unrecognized token " + token +
+                    " in input: " + configuration +
+                    " expecting: " + match +
+                    " at position " + this.position
+            );
         }
         this.position++;
         return token;
     }
 
-    protected String lookAhead() {
+    protected Character lookAhead() {
         Integer nextPosition = this.position;
         if (nextPosition.equals(this.configuration.length())) {
-            return "";
+            return null;
         }
-        return this.configuration.substring(this.position, this.position + 1);
+        return this.configuration.charAt(this.position);
     }
 }

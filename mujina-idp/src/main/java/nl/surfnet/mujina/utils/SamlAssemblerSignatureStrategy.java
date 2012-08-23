@@ -17,14 +17,11 @@
 package nl.surfnet.mujina.utils;
 
 import org.apache.xml.security.signature.ObjectContainer;
-import org.apache.xml.security.signature.XMLSignature;
-import org.opensaml.common.xml.SAMLConstants;
+import org.opensaml.saml2.core.Assertion;
+import org.opensaml.saml2.core.impl.AssertionMarshaller;
 import org.opensaml.xml.signature.Signature;
 import org.opensaml.xml.signature.impl.SignatureImpl;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
-import javax.xml.parsers.DocumentBuilderFactory;
 
 public class SamlAssemblerSignatureStrategy implements SamlAssemblerStrategy {
     private SignatureImpl signature;
@@ -39,10 +36,14 @@ public class SamlAssemblerSignatureStrategy implements SamlAssemblerStrategy {
 
     public SamlAssemblerStrategy add(SamlAssemblerAssertionStrategy element) {
         try {
-            ObjectContainer object = new ObjectContainer(
-                element.getAssertion().getDOM().getOwnerDocument()
-            );
-            object.appendChild(element.getAssertion().getDOM());
+            // First we need to marshall the assertion
+            Assertion childAssertion = element.getAssertion();
+            AssertionMarshaller marshaller = new AssertionMarshaller();
+            childAssertion.setDOM(marshaller.marshall(childAssertion));
+            Document assertionDocument = childAssertion.getDOM().getOwnerDocument();
+
+            ObjectContainer object = new ObjectContainer(assertionDocument);
+            object.appendChild(childAssertion.getDOM());
             signature.getXMLSignature().appendObject(object);
         }
         catch (Exception e) {
