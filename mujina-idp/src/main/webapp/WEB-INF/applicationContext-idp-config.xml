@@ -33,13 +33,18 @@
 
   <bean id="singleSignOnService" class="nl.surfnet.mujina.saml.SingleSignOnService">
     <constructor-arg value="${AUTHN_RESPONDER_URI}"/>
-    <constructor-arg ref="bindingAdapter"/>
+    <constructor-arg>
+      <list>
+        <ref bean="postBindingAdapter"/>
+        <ref bean="redirectBindingAdapter"/>
+      </list>
+    </constructor-arg>
     <constructor-arg ref="samlValidatorSuite"/>
   </bean>
 
   <bean id="authnResponder" class="nl.surfnet.mujina.saml.SSOSuccessAuthnResponder">
     <constructor-arg ref="timeService"/>
-    <constructor-arg ref="bindingAdapter"/>
+    <constructor-arg ref="postBindingAdapter"/>
     <constructor-arg ref="idService"/>
     <constructor-arg ref="keyStoreCredentialResolverDelegate"/>
     <property name="responseValidityTimeInSeconds" value="${ASSERTION_VALIDITY_TIME_INS_SECONDS}"/>
@@ -62,12 +67,24 @@
     <property name="maxPoolSize" value="${MAX_PARSER_POOL_SIZE}"/>
   </bean>
 
-  <bean id="decoder" class="org.opensaml.saml2.binding.decoding.HTTPPostSimpleSignDecoder">
+  <bean id="httpPostSimpleSignDecoder" class="org.opensaml.saml2.binding.decoding.HTTPPostSimpleSignDecoder">
     <constructor-arg ref="samlParserPool"/>
   </bean>
 
-  <bean id="bindingAdapter" class="nl.surfnet.mujina.saml.PostBindingAdapter">
-    <constructor-arg ref="decoder"/>
+  <bean id="httpRedirectDeflateEncoder" class="org.opensaml.saml2.binding.encoding.HTTPRedirectDeflateEncoder" />
+  <bean id="httpRedirectDeflateDecoder" class="org.opensaml.saml2.binding.decoding.HTTPRedirectDeflateDecoder">
+     <constructor-arg ref="samlParserPool"/>
+  </bean>
+
+  <bean id="redirectBindingAdapter" class="nl.surfnet.mujina.saml.RedirectBindingAdapter">
+    <constructor-arg ref="httpRedirectDeflateEncoder"/>
+    <constructor-arg ref="httpRedirectDeflateDecoder"/>
+    <constructor-arg ref="securityPolicyResolver"/>
+    <property name="configuration" ref="idpConfiguration" />
+  </bean>
+
+  <bean id="postBindingAdapter" class="nl.surfnet.mujina.saml.PostBindingAdapter">
+    <constructor-arg ref="httpPostSimpleSignDecoder"/>
     <constructor-arg ref="securityPolicyResolver"/>
     <property name="velocityEngine" ref="velocityEngine"/>
     <property name="configuration" ref="idpConfiguration" />

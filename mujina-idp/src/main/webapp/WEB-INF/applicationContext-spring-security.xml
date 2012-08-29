@@ -52,7 +52,7 @@
     <beans:constructor-arg ref="timeService"/>
     <beans:constructor-arg ref="idService"/>
     <beans:constructor-arg name="credentialResolver" ref="keyStoreCredentialResolverDelegate"/>
-    <beans:constructor-arg name="bindingAdapter" ref="bindingAdapter"/>
+    <beans:constructor-arg name="bindingAdapter" ref="postBindingAdapter"/>
     <beans:constructor-arg ref="simpleUrlAuthenticationFailureHandler"/>
   </beans:bean>
   

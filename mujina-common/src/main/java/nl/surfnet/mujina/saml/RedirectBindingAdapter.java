@@ -33,12 +33,11 @@ import org.opensaml.ws.transport.http.HttpServletResponseAdapter;
 import org.opensaml.xml.security.SecurityException;
 import org.opensaml.xml.security.credential.Credential;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Required;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-public class PostBindingAdapter implements BindingAdapter, InitializingBean {
+public class RedirectBindingAdapter implements BindingAdapter, InitializingBean {
 
     static final String SAML_REQUEST_POST_PARAM_NAME = "SAMLRequest";
     static final String SAML_RESPONSE_POST_PARAM_NAME = "SAMLResponse";
@@ -51,9 +50,11 @@ public class PostBindingAdapter implements BindingAdapter, InitializingBean {
 
     private CommonConfiguration configuration;
 
-    public PostBindingAdapter(SAMLMessageDecoder decoder,
-                              SecurityPolicyResolver resolver) {
+    public RedirectBindingAdapter(SAMLMessageEncoder encoder,
+                                  SAMLMessageDecoder decoder,
+                                  SecurityPolicyResolver resolver) {
         super();
+        this.encoder = encoder;
         this.decoder = decoder;
         this.resolver = resolver;
     }
@@ -62,16 +63,9 @@ public class PostBindingAdapter implements BindingAdapter, InitializingBean {
         this.configuration = configuration;
     }
 
-
-    @Required
-    public void setVelocityEngine(
-            VelocityEngine velocityEngine) {
-        this.velocityEngine = velocityEngine;
-    }
-
     @Override
     public Boolean isUsedBy(HttpServletRequest request) {
-        return request.getMethod().equals("POST");
+        return request.getMethod().equals("GET");
     }
 
     @Override
@@ -85,7 +79,6 @@ public class PostBindingAdapter implements BindingAdapter, InitializingBean {
         decoder.decode(messageContext);
 
         return messageContext;
-
     }
 
     @Override
@@ -107,7 +100,6 @@ public class PostBindingAdapter implements BindingAdapter, InitializingBean {
         messageContext.setRelayState(relayState);
 
         encoder.encode(messageContext);
-
     }
 
 
@@ -123,11 +115,5 @@ public class PostBindingAdapter implements BindingAdapter, InitializingBean {
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        encoder = new HTTPPostConfigurableSignEncoder(
-            velocityEngine,
-            "/templates/saml2-post-simplesign-binding.vm",
-            true,
-            configuration
-        );
     }
 }

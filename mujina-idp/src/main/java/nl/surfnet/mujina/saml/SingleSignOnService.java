@@ -32,6 +32,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
 
 public class SingleSignOnService implements HttpRequestHandler {
 
@@ -39,15 +40,16 @@ public class SingleSignOnService implements HttpRequestHandler {
     private final static Logger logger = LoggerFactory
             .getLogger(SingleSignOnService.class);
 
-    private final BindingAdapter adapter;
+    private final List<BindingAdapter> adapters;
     private final String authnResponderURI;
     private final SAML2ValidatorSuite validatorSuite;
 
 
-    public SingleSignOnService(BindingAdapter adapter,
-                               String authnResponderURI, SAML2ValidatorSuite validatorSuite) {
+    public SingleSignOnService(String authnResponderURI,
+                               List<BindingAdapter> adapters,
+                               SAML2ValidatorSuite validatorSuite) {
         super();
-        this.adapter = adapter;
+        this.adapters = adapters;
         this.authnResponderURI = authnResponderURI;
         this.validatorSuite = validatorSuite;
     }
@@ -58,7 +60,14 @@ public class SingleSignOnService implements HttpRequestHandler {
                               HttpServletResponse response) throws ServletException, IOException {
         SAMLMessageContext messageContext = null;
         try {
-            messageContext = adapter.extractSAMLMessageContext(request);
+            for (BindingAdapter adapter : adapters) {
+                if (adapter.isUsedBy(request)) {
+                    messageContext = adapter.extractSAMLMessageContext(request);
+                }
+            }
+            if (messageContext == null) {
+                throw new RuntimeException("Unable to detect binding used!");
+            }
         } catch (MessageDecodingException mde) {
             logger.error("Exception decoding SAML message", mde);
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);

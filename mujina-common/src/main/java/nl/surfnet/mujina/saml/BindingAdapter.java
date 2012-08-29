@@ -29,6 +29,8 @@ import javax.servlet.http.HttpServletResponse;
 
 public interface BindingAdapter {
 
+    public Boolean isUsedBy(HttpServletRequest request);
+
     public void sendSAMLMessage(SignableSAMLObject samlMessage,
                                 Endpoint endpoint,
                                 Credential signingCredential,
