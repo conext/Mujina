@@ -86,7 +86,7 @@ public class TestHelper {
         String authnRequest = createAuthnRequest();
 
         String samlResponse = doIdpLogin(authnRequest, user, password);
-System.out.println(prettyFormat(samlResponse));
+        //System.out.println(prettyFormat(samlResponse));
         return unmarshalSamlResponse(samlResponse);
     }
 
