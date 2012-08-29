@@ -192,14 +192,14 @@ public class IdpRestAPITest {
         assertNotNull(response);
     }
 
-    @Test
-    public void testXswLevel3() throws IOException, ServletException, MessageEncodingException, XMLParserException, XMLSecurityException, UnmarshallingException {
-        SigningConfiguration config = new SigningConfiguration();
-        config.setSetting("XSW:S(E(A))");
-        commonAPI.setSigning(config);
-
-        final Response response = testHelper.doSamlLogin(DEFAULT_USER, DEFAULT_PASSWORD);
-        assertNotNull(response);
-        assertEquals(true, false);
-    }
+//    @Test
+//    public void testXswLevel3() throws IOException, ServletException, MessageEncodingException, XMLParserException, XMLSecurityException, UnmarshallingException {
+//        SigningConfiguration config = new SigningConfiguration();
+//        config.setSetting("XSW:S(E(A))");
+//        commonAPI.setSigning(config);
+//
+//        final Response response = testHelper.doSamlLogin(DEFAULT_USER, DEFAULT_PASSWORD);
+//        assertNotNull(response);
+//        assertEquals(true, false);
+//    }
 }
