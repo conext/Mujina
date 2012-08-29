@@ -127,7 +127,7 @@ public class RealAuthenticationFailureHandler implements AuthenticationFailureHa
         request.getSession().removeAttribute(AuthnRequestInfo.class.getName());
 
         try {
-            bindingAdapter.sendSAMLMessage(authResponse, endpoint, signingCredential, response);
+            bindingAdapter.sendSAMLMessage(authResponse, endpoint, signingCredential, response, authnRequestInfo.getRelayState());
         } catch (MessageEncodingException mee) {
             logger.error("Exception encoding SAML message", mee);
             response.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
