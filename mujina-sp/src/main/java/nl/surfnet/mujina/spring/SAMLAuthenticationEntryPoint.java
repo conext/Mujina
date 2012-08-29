@@ -16,18 +16,18 @@
 
 package nl.surfnet.mujina.spring;
 
-import java.io.IOException;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import nl.surfnet.mujina.model.SpConfiguration;
+import nl.surfnet.mujina.saml.AuthnRequestGenerator;
+import nl.surfnet.mujina.saml.BindingAdapter;
+import nl.surfnet.mujina.saml.xml.EndpointGenerator;
+import nl.surfnet.mujina.util.IDService;
+import nl.surfnet.mujina.util.TimeService;
 import org.apache.commons.lang.Validate;
 import org.opensaml.saml2.core.AuthnRequest;
 import org.opensaml.saml2.metadata.Endpoint;
 import org.opensaml.saml2.metadata.SingleSignOnService;
 import org.opensaml.ws.message.encoder.MessageEncodingException;
-import org.opensaml.xml.security.*;
+import org.opensaml.xml.security.CriteriaSet;
 import org.opensaml.xml.security.credential.Credential;
 import org.opensaml.xml.security.credential.CredentialResolver;
 import org.opensaml.xml.security.credential.UsageType;
@@ -39,12 +39,10 @@ import org.springframework.beans.factory.annotation.Required;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 
-import nl.surfnet.mujina.model.SpConfiguration;
-import nl.surfnet.mujina.saml.AuthnRequestGenerator;
-import nl.surfnet.mujina.saml.BindingAdapter;
-import nl.surfnet.mujina.saml.xml.EndpointGenerator;
-import nl.surfnet.mujina.util.IDService;
-import nl.surfnet.mujina.util.TimeService;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 public class SAMLAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
@@ -97,7 +95,7 @@ public class SAMLAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
         Endpoint endpoint = endpointGenerator.generateEndpoint(SingleSignOnService.DEFAULT_ELEMENT_NAME, singleSignOnServiceURL, assertionConsumerServiceURL);
 
-        AuthnRequest authnReqeust = authnRequestGenerator.generateAuthnRequest(singleSignOnServiceURL, assertionConsumerServiceURL);
+        AuthnRequest authnRequest = authnRequestGenerator.generateAuthnRequest(singleSignOnServiceURL, assertionConsumerServiceURL);
 
         log.debug("Sending authnRequest to {}", singleSignOnServiceURL);
 
@@ -109,7 +107,7 @@ public class SAMLAuthenticationEntryPoint implements AuthenticationEntryPoint {
             Credential signingCredential = credentialResolver.resolveSingle(criteriaSet);
             Validate.notNull(signingCredential);
 
-            bindingAdapter.sendSAMLMessage(authnReqeust, endpoint, signingCredential, response);
+            bindingAdapter.sendSAMLMessage(authnRequest, endpoint, signingCredential, response, "");
         } catch (MessageEncodingException mee) {
             log.error("Could not send authnRequest to Identity Provider.", mee);
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
