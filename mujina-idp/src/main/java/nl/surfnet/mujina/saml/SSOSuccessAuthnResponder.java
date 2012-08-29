@@ -227,7 +227,7 @@ public class SSOSuccessAuthnResponder implements HttpRequestHandler {
 
         //we could use a different adapter to send the response based on request issuer...
         try {
-            adapter.sendSAMLMessage(authResponse, endpoint, signingCredential, response);
+            adapter.sendSAMLMessage(authResponse, endpoint, signingCredential, response, info.getRelayState());
         } catch (MessageEncodingException mee) {
             logger.error("Exception encoding SAML message", mee);
             response.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE);

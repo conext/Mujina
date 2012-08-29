@@ -22,30 +22,35 @@ import java.io.Serializable;
 
 public class AuthnRequestInfo implements Serializable {
 
-    private final String assertionConumerURL;
+    private final String assertionConsumerURL;
     private final String authnRequestID;
+    private final String relayState;
 
-    public AuthnRequestInfo(String assertionConumerURL, String authnRequestID) {
+    public AuthnRequestInfo(String assertionConsumerURL, String authnRequestID, String relayState) {
         super();
-        this.assertionConumerURL = assertionConumerURL;
+        this.assertionConsumerURL = assertionConsumerURL;
         this.authnRequestID = authnRequestID;
+        this.relayState = relayState;
     }
 
     public String getAssertionConsumerURL() {
-        return assertionConumerURL;
+        return assertionConsumerURL;
     }
 
     public String getAuthnRequestID() {
         return authnRequestID;
     }
 
+    public String getRelayState() {
+        return relayState;
+    }
+
     @Override
     public String toString() {
         return new ToStringBuilder(this).
-                append("assertionConumerURL", assertionConumerURL).
+                append("assertionConsumerURL", assertionConsumerURL).
                 append("authnRequestID", authnRequestID).
+                append("relayState", relayState).
                 toString();
-
-
     }
 }

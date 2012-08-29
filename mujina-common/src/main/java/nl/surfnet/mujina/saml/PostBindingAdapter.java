@@ -88,7 +88,8 @@ public class PostBindingAdapter implements BindingAdapter, InitializingBean {
     public void sendSAMLMessage(SignableSAMLObject samlMessage,
                                 Endpoint endpoint,
                                 Credential signingCredential,
-                                HttpServletResponse response) throws MessageEncodingException {
+                                HttpServletResponse response,
+                                String relayState) throws MessageEncodingException {
 
         HttpServletResponseAdapter outTransport = new HttpServletResponseAdapter(response, false);
 
@@ -99,6 +100,7 @@ public class PostBindingAdapter implements BindingAdapter, InitializingBean {
         messageContext.setOutboundSAMLMessage(samlMessage);
         messageContext.setOutboundMessageIssuer(configuration.getEntityID());
         messageContext.setOutboundSAMLMessageSigningCredential(signingCredential);
+        messageContext.setRelayState(relayState);
 
         encoder.encode(messageContext);
 
@@ -124,6 +126,4 @@ public class PostBindingAdapter implements BindingAdapter, InitializingBean {
             configuration
         );
     }
-
-
 }

@@ -16,12 +16,8 @@
 
 package nl.surfnet.mujina.saml;
 
-import java.io.IOException;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import nl.surfnet.mujina.saml.xml.SAML2ValidatorSuite;
+import nl.surfnet.mujina.spring.AuthnRequestInfo;
 import org.opensaml.common.binding.SAMLMessageContext;
 import org.opensaml.saml2.core.AuthnRequest;
 import org.opensaml.ws.message.decoder.MessageDecodingException;
@@ -32,8 +28,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.web.WebAttributes;
 import org.springframework.web.HttpRequestHandler;
 
-import nl.surfnet.mujina.saml.xml.SAML2ValidatorSuite;
-import nl.surfnet.mujina.spring.AuthnRequestInfo;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 public class SingleSignOnService implements HttpRequestHandler {
 
@@ -81,7 +79,11 @@ public class SingleSignOnService implements HttpRequestHandler {
             return;
         }
 
-        AuthnRequestInfo info = new AuthnRequestInfo(authnRequest.getAssertionConsumerServiceURL(), authnRequest.getID());
+        AuthnRequestInfo info = new AuthnRequestInfo(
+            authnRequest.getAssertionConsumerServiceURL(),
+            authnRequest.getID(),
+            messageContext.getRelayState()
+        );
 
         logger.debug("AuthnRequest {} vefified.  Forwarding to SSOSuccessAuthnResponder", info);
         request.getSession().setAttribute(AuthnRequestInfo.class.getName(), info);
