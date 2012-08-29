@@ -18,9 +18,7 @@ package nl.surfnet.mujina.saml;
 
 import nl.surfnet.mujina.model.IdpConfiguration;
 import nl.surfnet.mujina.model.SimpleAuthentication;
-import nl.surfnet.mujina.saml.xml.AssertionGenerator;
-import nl.surfnet.mujina.saml.xml.AuthnResponseGenerator;
-import nl.surfnet.mujina.saml.xml.EndpointGenerator;
+import nl.surfnet.mujina.saml.xml.*;
 import nl.surfnet.mujina.spring.AuthnRequestInfo;
 import nl.surfnet.mujina.util.IDService;
 import nl.surfnet.mujina.util.TimeService;
@@ -32,6 +30,7 @@ import org.opensaml.saml2.core.AttributeValue;
 import org.opensaml.saml2.core.Response;
 import org.opensaml.saml2.metadata.Endpoint;
 import org.opensaml.ws.message.encoder.MessageEncodingException;
+import org.opensaml.xml.XMLObjectBuilderFactory;
 import org.opensaml.xml.io.MarshallingException;
 import org.opensaml.xml.schema.XSString;
 import org.opensaml.xml.schema.impl.XSStringBuilder;
@@ -41,11 +40,9 @@ import org.opensaml.xml.security.credential.CredentialResolver;
 import org.opensaml.xml.security.credential.UsageType;
 import org.opensaml.xml.security.criteria.EntityIDCriteria;
 import org.opensaml.xml.security.criteria.UsageCriteria;
-import org.opensaml.xml.signature.Signature;
 import org.opensaml.xml.signature.SignatureConstants;
 import org.opensaml.xml.signature.SignatureException;
 import org.opensaml.xml.signature.Signer;
-import org.opensaml.xml.signature.impl.SignatureImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,6 +56,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 public class SSOSuccessAuthnResponder implements HttpRequestHandler {
+    private final XMLObjectBuilderFactory builderFactory = org.opensaml.Configuration.getBuilderFactory();
 
     private final TimeService timeService;
     private final IDService idService;
@@ -93,6 +91,17 @@ public class SSOSuccessAuthnResponder implements HttpRequestHandler {
     @Override
     public void handleRequest(HttpServletRequest request,
                               HttpServletResponse response) throws ServletException, IOException {
+        // Note that we have our own signature building because the default OpenSAML XMLTooling Signature
+        // doesn't allow for Object element, which we need to test XML Signature Wrapping attacks
+        builderFactory.registerBuilder(
+            Signature.DEFAULT_ELEMENT_NAME,
+            new SignatureBuilder()
+        );
+        builderFactory.registerBuilder(
+            SignatureObject.DEFAULT_ELEMENT_NAME,
+            new SignatureObjectBuilder()
+        );
+
         AuthnRequestInfo info = (AuthnRequestInfo) request.getSession().getAttribute(AuthnRequestInfo.class.getName());
 
         if (info == null) {
@@ -202,18 +211,6 @@ public class SSOSuccessAuthnResponder implements HttpRequestHandler {
                 assertionSignature
             );
             authResponse = interpreter.interpret();
-
-//            try {
-//                org.opensaml.Configuration.getMarshallerFactory().getMarshaller(assertion).marshall(assertion);
-//                org.opensaml.Configuration.getMarshallerFactory().getMarshaller(evilAssertion).marshall(evilAssertion);
-//            } catch (MarshallingException e) {
-//                e.printStackTrace();
-//            }
-//            try {
-//                Signer.signObject(assertionSignature);
-//            } catch (SignatureException e) {
-//                e.printStackTrace();
-//            }
         }
 
         EndpointGenerator endpointGenerator = new EndpointGenerator();

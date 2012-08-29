@@ -16,15 +16,16 @@
 
 package nl.surfnet.mujina.utils;
 
-import org.apache.xml.security.signature.ObjectContainer;
-import org.opensaml.saml2.core.Assertion;
-import org.opensaml.saml2.core.impl.AssertionMarshaller;
+import nl.surfnet.mujina.saml.xml.SignatureImpl;
+import nl.surfnet.mujina.saml.xml.SignatureObject;
+import nl.surfnet.mujina.saml.xml.SignatureObjectBuilder;
+import nl.surfnet.mujina.saml.xml.SignatureObjectImpl;
+import org.opensaml.xml.XMLObjectBuilderFactory;
 import org.opensaml.xml.signature.Signature;
-import org.opensaml.xml.signature.impl.SignatureImpl;
-import org.w3c.dom.Document;
 
 public class SamlAssemblerSignatureStrategy implements SamlAssemblerStrategy {
     private SignatureImpl signature;
+    private final XMLObjectBuilderFactory builderFactory = org.opensaml.Configuration.getBuilderFactory();
 
     public SamlAssemblerSignatureStrategy(SignatureImpl signature) {
         this.signature = signature;
@@ -36,15 +37,10 @@ public class SamlAssemblerSignatureStrategy implements SamlAssemblerStrategy {
 
     public SamlAssemblerStrategy add(SamlAssemblerAssertionStrategy element) {
         try {
-            // First we need to marshall the assertion
-            Assertion childAssertion = element.getAssertion();
-            AssertionMarshaller marshaller = new AssertionMarshaller();
-            childAssertion.setDOM(marshaller.marshall(childAssertion));
-            Document assertionDocument = childAssertion.getDOM().getOwnerDocument();
-
-            ObjectContainer object = new ObjectContainer(assertionDocument);
-            object.appendChild(childAssertion.getDOM());
-            signature.getXMLSignature().appendObject(object);
+            SignatureObjectBuilder signatureObjectBuilder = (SignatureObjectBuilder) builderFactory.getBuilder(SignatureObject.DEFAULT_ELEMENT_NAME);
+            SignatureObjectImpl signatureObject = signatureObjectBuilder.buildObject();
+            signatureObject.getChildren().add(element.getAssertion());
+            signature.getSignatureObjects().add(signatureObject);
         }
         catch (Exception e) {
             e.printStackTrace();

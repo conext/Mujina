@@ -29,16 +29,12 @@ import org.opensaml.saml2.core.Assertion;
 import org.opensaml.saml2.core.AuthnStatement;
 import org.opensaml.saml2.core.Issuer;
 import org.opensaml.saml2.core.Subject;
-import org.opensaml.xml.XMLObjectBuilderFactory;
 import org.opensaml.xml.security.credential.Credential;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class AssertionGenerator {
-
-    private final XMLObjectBuilderFactory builderFactory = org.opensaml.Configuration.getBuilderFactory();
-
     private final IssuerGenerator issuerGenerator;
     private final SubjectGenerator subjectGenerator;
     private final IDService idService;

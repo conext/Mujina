@@ -14,7 +14,18 @@
  * limitations under the License.
  */
 
-package nl.surfnet.mujina.saml;
+package nl.surfnet.mujina.saml.xml;
 
-public class SignatureMarshaller {
+import org.opensaml.xml.util.XMLConstants;
+
+public class SignatureBuilder extends org.opensaml.xml.signature.impl.SignatureBuilder {
+    /** {@inheritDoc} */
+    public SignatureImpl buildObject() {
+        return buildObject(XMLConstants.XMLSIG_NS, SignatureImpl.DEFAULT_ELEMENT_LOCAL_NAME, XMLConstants.XMLSIG_PREFIX);
+    }
+
+    /** {@inheritDoc} */
+    public SignatureImpl buildObject(String namespaceURI, String localName, String namespacePrefix) {
+        return new SignatureImpl(namespaceURI, localName, namespacePrefix);
+    }
 }

@@ -16,10 +16,12 @@
 
 package nl.surfnet.mujina.utils;
 
+import org.opensaml.saml2.core.Advice;
 import org.opensaml.saml2.core.Assertion;
-import org.opensaml.saml2.core.impl.AdviceImpl;
+import org.opensaml.xml.XMLObjectBuilderFactory;
 
 public class SamlAssemblerAssertionStrategy implements SamlAssemblerStrategy {
+    private final XMLObjectBuilderFactory builderFactory = org.opensaml.Configuration.getBuilderFactory();
     private Assertion assertion;
 
     public SamlAssemblerAssertionStrategy(Assertion assertion) {
@@ -31,7 +33,9 @@ public class SamlAssemblerAssertionStrategy implements SamlAssemblerStrategy {
     }
 
     public SamlAssemblerStrategy add(SamlAssemblerAssertionStrategy element) {
-        assertion.getAdvice().getAssertions().add(element.getAssertion());
+        Advice newAdvice = (Advice) builderFactory.getBuilder(Advice.DEFAULT_ELEMENT_NAME).buildObject(Advice.DEFAULT_ELEMENT_NAME);
+        newAdvice.getAssertions().add(element.getAssertion());
+        assertion.setAdvice(newAdvice);
         return element;
     }
 

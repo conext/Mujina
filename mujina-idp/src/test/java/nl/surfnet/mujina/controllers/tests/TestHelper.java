@@ -86,7 +86,7 @@ public class TestHelper {
         String authnRequest = createAuthnRequest();
 
         String samlResponse = doIdpLogin(authnRequest, user, password);
-//System.out.println(prettyFormat(samlResponse));
+System.out.println(prettyFormat(samlResponse));
         return unmarshalSamlResponse(samlResponse);
     }
 
@@ -135,7 +135,7 @@ public class TestHelper {
         Endpoint endpoint = endpointGenerator.generateEndpoint(org.opensaml.saml2.metadata.SingleSignOnService.DEFAULT_ELEMENT_NAME, singleSignOnServiceURL, assertionConsumerServiceURL);
         AuthnRequest authnReqeust = authnRequestGenerator.generateAuthnRequest(singleSignOnServiceURL, assertionConsumerServiceURL);
         MockHttpServletResponse authnResponse = new MockHttpServletResponse();
-        postBindingAdapter.sendSAMLMessage(authnReqeust, endpoint, null, authnResponse);
+        postBindingAdapter.sendSAMLMessage(authnReqeust, endpoint, null, authnResponse,"");
         assertEquals(authnResponse.getStatus(), 200);
         return readSamlRequestFromResponse(authnResponse);
     }

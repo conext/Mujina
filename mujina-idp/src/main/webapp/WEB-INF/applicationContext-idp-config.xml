@@ -33,13 +33,13 @@
 
   <bean id="singleSignOnService" class="nl.surfnet.mujina.saml.SingleSignOnService">
     <constructor-arg value="${AUTHN_RESPONDER_URI}"/>
-    <constructor-arg ref="bindingAdpater"/>
+    <constructor-arg ref="bindingAdapter"/>
     <constructor-arg ref="samlValidatorSuite"/>
   </bean>
 
   <bean id="authnResponder" class="nl.surfnet.mujina.saml.SSOSuccessAuthnResponder">
     <constructor-arg ref="timeService"/>
-    <constructor-arg ref="bindingAdpater"/>
+    <constructor-arg ref="bindingAdapter"/>
     <constructor-arg ref="idService"/>
     <constructor-arg ref="keyStoreCredentialResolverDelegate"/>
     <property name="responseValidityTimeInSeconds" value="${ASSERTION_VALIDITY_TIME_INS_SECONDS}"/>
@@ -66,7 +66,7 @@
     <constructor-arg ref="samlParserPool"/>
   </bean>
 
-  <bean id="bindingAdpater" class="nl.surfnet.mujina.saml.PostBindingAdapter">
+  <bean id="bindingAdapter" class="nl.surfnet.mujina.saml.PostBindingAdapter">
     <constructor-arg ref="decoder"/>
     <constructor-arg ref="securityPolicyResolver"/>
     <property name="velocityEngine" ref="velocityEngine"/>

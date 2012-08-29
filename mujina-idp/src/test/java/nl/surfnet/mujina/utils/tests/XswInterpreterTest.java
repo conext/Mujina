@@ -17,6 +17,7 @@
 package nl.surfnet.mujina.utils.tests;
 
 
+import nl.surfnet.mujina.saml.xml.*;
 import nl.surfnet.mujina.utils.XswInterpreter;
 import org.apache.xml.security.signature.XMLSignature;
 import org.junit.Before;
@@ -30,8 +31,6 @@ import org.opensaml.saml2.core.impl.AssertionMarshaller;
 import org.opensaml.saml2.core.impl.ResponseBuilder;
 import org.opensaml.xml.XMLObjectBuilderFactory;
 import org.opensaml.xml.signature.ContentReference;
-import org.opensaml.xml.signature.Signature;
-import org.opensaml.xml.signature.impl.SignatureImpl;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.w3c.dom.Document;
@@ -48,6 +47,8 @@ import static junit.framework.Assert.assertEquals;
     "classpath:api-servlet.xml",
     "classpath:test-beans.xml"})
 public class XswInterpreterTest {
+    private final XMLObjectBuilderFactory builderFactory = org.opensaml.Configuration.getBuilderFactory();
+
     protected Response response;
     protected SignatureImpl signature;
     protected AssertionImpl assertion;
@@ -55,7 +56,16 @@ public class XswInterpreterTest {
 
     @Before
     public void setUp() {
-        XMLObjectBuilderFactory builderFactory = org.opensaml.Configuration.getBuilderFactory();
+        // Note that we have our own signature building because the default OpenSAML XMLTooling Signature
+        // doesn't allow for Object element, which we need to test XML Signature Wrapping attacks
+        builderFactory.registerBuilder(
+            Signature.DEFAULT_ELEMENT_NAME,
+            new SignatureBuilder()
+        );
+        builderFactory.registerBuilder(
+            SignatureObject.DEFAULT_ELEMENT_NAME,
+            new SignatureObjectBuilder()
+        );
 
         ResponseBuilder responseBuilder = (ResponseBuilder) builderFactory
             .getBuilder(Response.DEFAULT_ELEMENT_NAME);
@@ -264,37 +274,35 @@ public class XswInterpreterTest {
         }
     }
 
-// @todo this is currently broken!
-//    @Test
-//    public void testNestedWithForwardReferenceSAE() {
-//        try {
-//            Response response = createInterpreter("S>A(A(E))").interpret();
-//
-//            // Create the content references to the document for us to check
-//            XMLSignature dsig = signature.getXMLSignature();
-//            for (ContentReference contentReference : signature.getContentReferences()) {
-//                contentReference.createReference(dsig);
-//            }
-//            SignatureImpl responseSignature = (SignatureImpl)response.getSignature();
-//            assertEquals(
-//                "S>A(A(E)): Signature references proper assertion",
-//                responseSignature.getXMLSignature().getSignedInfo().item(0).getURI(),
-//                "#" + assertion.getSignatureReferenceID()
-//            );
-//
-//            // @todo maybe unmarshall it to an Assertion object first?
-//            Node childAssertion = responseSignature.getXMLSignature().getObjectItem(0).getElement().getChildNodes().item(0);
-//            String firstAttributeValue = childAssertion.getAttributes().item(0).getNodeValue();
-//
-//            assertEquals(
-//                "S>A(A(E)): Proper assertion is nested under the signature",
-//                firstAttributeValue, assertion.getID()
-//            );
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            throw new RuntimeException(e.getMessage());
-//        }
-//    }
+    @Test
+    public void testNestedWithForwardReferenceSAE() {
+        try {
+            Response response = createInterpreter("S>A(A(E))").interpret();
+
+            // Create the content references to the document for us to check
+            XMLSignature dsig = signature.getXMLSignature();
+            for (ContentReference contentReference : signature.getContentReferences()) {
+                contentReference.createReference(dsig);
+            }
+            SignatureImpl responseSignature = (SignatureImpl)response.getSignature();
+            assertEquals(
+                "S>A(A(E)): Signature references proper assertion",
+                responseSignature.getXMLSignature().getSignedInfo().item(0).getURI(),
+                "#" + assertion.getSignatureReferenceID()
+            );
+
+            Assertion childAssertion = (Assertion)responseSignature.getSignatureObjects().get(0).getChildren().get(0);
+
+            assertEquals(
+                "S>A(A(E)): Proper assertion is nested under the signature",
+                childAssertion.getID(),
+                assertion.getID()
+            );
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e.getMessage());
+        }
+    }
 
     public XswInterpreter createInterpreter(String configuration) {
         return new XswInterpreter(configuration, response, assertion, evilAssertion, signature);

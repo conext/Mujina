@@ -62,7 +62,7 @@
   <beans:bean id="samlSolicitedFilter" class="nl.surfnet.mujina.spring.SAMLResponseAuthenticationProcessingFilter">
     <beans:constructor-arg value="${ASSERTION_CONSUMER_URI}"/>
     <beans:property name="filterProcessesUrl" value="${ASSERTION_CONSUMER_URI}"/>
-    <beans:property name="bindingAdapter" ref="bindingAdpater"/>
+    <beans:property name="bindingAdapter" ref="bindingAdapter"/>
     <beans:property name="authenticationManager" ref="authenticationManager"/>
     <beans:property name="authenticationFailureHandler" ref="authenticationFailureHandler"/>
   </beans:bean>
@@ -72,7 +72,7 @@
     <beans:constructor-arg ref="idService"/>
     <beans:property name="assertionConsumerServiceURL" value="${ASSERTION_CONSUMER_URL}"/>
     <beans:property name="credentialResolver" ref="keyStoreCredentialResolverDelegate"/>
-    <beans:property name="bindingAdapter" ref="bindingAdpater"/>
+    <beans:property name="bindingAdapter" ref="bindingAdapter"/>
     <beans:property name="configuration" ref="spConfiguration" />
   </beans:bean>
 

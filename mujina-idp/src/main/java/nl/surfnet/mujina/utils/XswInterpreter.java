@@ -19,7 +19,7 @@ package nl.surfnet.mujina.utils;
 import org.opensaml.common.impl.SAMLObjectContentReference;
 import org.opensaml.saml2.core.Response;
 import org.opensaml.saml2.core.impl.AssertionImpl;
-import org.opensaml.xml.signature.impl.SignatureImpl;
+import nl.surfnet.mujina.saml.xml.SignatureImpl;
 
 /**
  * Interprets the XML Signature Wrapping configuration of objects and wires them up properly by interpreting the configuration.

@@ -16,14 +16,10 @@
 
 package nl.surfnet.mujina.controllers.tests;
 
-import java.io.IOException;
-import java.util.Collections;
-
-import javax.servlet.ServletException;
-
+import nl.surfnet.mujina.controllers.CommonAPI;
+import nl.surfnet.mujina.controllers.IdentityProviderAPI;
 import nl.surfnet.mujina.model.*;
 import org.apache.xml.security.exceptions.XMLSecurityException;
-import org.apache.xml.security.signature.XMLSignature;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -36,8 +32,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import nl.surfnet.mujina.controllers.IdentityProviderAPI;
-import nl.surfnet.mujina.controllers.CommonAPI;
+import javax.servlet.ServletException;
+import java.io.IOException;
+import java.util.Collections;
 
 import static junit.framework.Assert.*;
 
@@ -193,5 +190,16 @@ public class IdpRestAPITest {
 
         final Response response = testHelper.doSamlLogin(DEFAULT_USER, DEFAULT_PASSWORD);
         assertNotNull(response);
+    }
+
+    @Test
+    public void testXswLevel3() throws IOException, ServletException, MessageEncodingException, XMLParserException, XMLSecurityException, UnmarshallingException {
+        SigningConfiguration config = new SigningConfiguration();
+        config.setSetting("XSW:S(E(A))");
+        commonAPI.setSigning(config);
+
+        final Response response = testHelper.doSamlLogin(DEFAULT_USER, DEFAULT_PASSWORD);
+        assertNotNull(response);
+        assertEquals(true, false);
     }
 }

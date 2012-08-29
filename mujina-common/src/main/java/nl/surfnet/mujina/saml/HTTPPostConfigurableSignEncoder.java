@@ -58,13 +58,18 @@ public class HTTPPostConfigurableSignEncoder extends HTTPPostSimpleSignEncoder {
         SAMLObject outboundSAML = messageContext.getOutboundSAMLMessage();
         Credential signingCredential = messageContext.getOuboundSAMLMessageSigningCredential();
 
-        if (outboundSAML instanceof SignableSAMLObject && signingCredential != null) {
-            SignableSAMLObject signableMessage = (SignableSAMLObject) outboundSAML;
+        if (!(outboundSAML instanceof SignableSAMLObject) || signingCredential == null) {
+            return;
+        }
+
+        SignableSAMLObject signableMessage = (SignableSAMLObject) outboundSAML;
+        Signature signature;
+        if (signableMessage.getSignature() == null) {
 
             XMLObjectBuilder<Signature> signatureBuilder = Configuration.getBuilderFactory().getBuilder(
                 Signature.DEFAULT_ELEMENT_NAME
             );
-            Signature signature = signatureBuilder.buildObject(Signature.DEFAULT_ELEMENT_NAME);
+            signature = signatureBuilder.buildObject(Signature.DEFAULT_ELEMENT_NAME);
 
             signature.setSigningCredential(signingCredential);
             try {
@@ -76,23 +81,26 @@ public class HTTPPostConfigurableSignEncoder extends HTTPPostSimpleSignEncoder {
             }
 
             signableMessage.setSignature(signature);
+        }
+        else {
+            signature = signableMessage.getSignature();
+        }
 
-            try {
-                Marshaller marshaller = Configuration.getMarshallerFactory().getMarshaller(signableMessage);
-                if (marshaller == null) {
-                    throw new MessageEncodingException("No marshaller registered for "
-                        + signableMessage.getElementQName() + ", unable to marshall in preperation for signing");
-                }
-                marshaller.marshall(signableMessage);
-
-                Signer.signObject(signature);
-            } catch (MarshallingException e) {
-                LOGGER.error("Unable to marshall protocol message in preparation for signing", e);
-                throw new MessageEncodingException("Unable to marshall protocol message in preparation for signing", e);
-            } catch (SignatureException e) {
-                LOGGER.error("Unable to sign protocol message", e);
-                throw new MessageEncodingException("Unable to sign protocol message", e);
+        try {
+            Marshaller marshaller = Configuration.getMarshallerFactory().getMarshaller(signableMessage);
+            if (marshaller == null) {
+                throw new MessageEncodingException("No marshaller registered for "
+                    + signableMessage.getElementQName() + ", unable to marshall in preperation for signing");
             }
+            marshaller.marshall(signableMessage);
+
+            Signer.signObject(signature);
+        } catch (MarshallingException e) {
+            LOGGER.error("Unable to marshall protocol message in preparation for signing", e);
+            throw new MessageEncodingException("Unable to marshall protocol message in preparation for signing", e);
+        } catch (SignatureException e) {
+            LOGGER.error("Unable to sign protocol message", e);
+            throw new MessageEncodingException("Unable to sign protocol message", e);
         }
     }
 }

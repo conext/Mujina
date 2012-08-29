@@ -14,7 +14,20 @@
  * limitations under the License.
  */
 
-package nl.surfnet.mujina.saml;
+package nl.surfnet.mujina.saml.xml;
 
-public class SignatureObjectMarshaller {
+import java.util.LinkedList;
+import java.util.List;
+
+public class SignatureImpl extends org.opensaml.xml.signature.impl.SignatureImpl implements Signature {
+    protected List<SignatureObjectImpl> signatureObjectList;
+
+    public SignatureImpl(String namespaceURI, String elementLocalName, String namespacePrefix) {
+        super(namespaceURI, elementLocalName, namespacePrefix);
+        signatureObjectList = new LinkedList<SignatureObjectImpl>();
+    }
+
+    public List<SignatureObjectImpl> getSignatureObjects() {
+        return signatureObjectList;
+    }
 }
