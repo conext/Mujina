@@ -98,6 +98,7 @@
     <javax.servlet.version>2.5</javax.servlet.version>
     <javax.servlet.jsp.version>2.0</javax.servlet.jsp.version>
     <javax.servlet.jstl.version>1.2</javax.servlet.jstl.version>
+    <google-guava.version>10.0.1</google-guava.version>
 
     <maven.plugin.compiler.version>2.3.2</maven.plugin.compiler.version>
     <maven.plugin.release.version>2.2.2</maven.plugin.release.version>

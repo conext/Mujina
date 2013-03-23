@@ -20,11 +20,13 @@ import java.util.Collection;
 import java.util.Map;
 
 public interface IdpConfiguration extends CommonConfiguration {
-  Map<String, String> getAttributes();
+  Map<String, Map<String, String>> getAttributeMap();
 
   Collection<SimpleAuthentication> getUsers();
 
   AuthenticationMethod.Method getAuthentication();
 
   void setAuthentication(AuthenticationMethod.Method method);
+
+  Map<String,String> createAttributeMap(String user);
 }
