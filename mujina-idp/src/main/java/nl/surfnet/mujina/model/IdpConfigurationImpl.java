@@ -59,14 +59,14 @@ public class IdpConfigurationImpl extends CommonConfigurationImpl implements Idp
 
         // Admin
         Map<String, String> userAttributeMap = Maps.newTreeMap();
-        userAttributeMap.put("urn:mace:dir:attribute-def:uid", "john.doe");
-        userAttributeMap.put("urn:mace:dir:attribute-def:cn", "John Doe");
-        userAttributeMap.put("urn:mace:dir:attribute-def:givenName", "John");
+        userAttributeMap.put("urn:mace:dir:attribute-def:uid", "admin");
+        userAttributeMap.put("urn:mace:dir:attribute-def:cn", "Admin Doe");
+        userAttributeMap.put("urn:mace:dir:attribute-def:givenName", "Admin");
         userAttributeMap.put("urn:mace:dir:attribute-def:sn", "Doe");
-        userAttributeMap.put("urn:mace:dir:attribute-def:displayName", "John Doe");
-        userAttributeMap.put("urn:mace:dir:attribute-def:mail", "j.doe@example.com");
+        userAttributeMap.put("urn:mace:dir:attribute-def:displayName", "Admin Doe");
+        userAttributeMap.put("urn:mace:dir:attribute-def:mail", "admin.doe@example.com");
         userAttributeMap.put("urn:mace:terena.org:attribute-def:schacHomeOrganization", "example.com");
-        userAttributeMap.put("urn:mace:dir:attribute-def:eduPersonPrincipalName", "j.doe@example.com");
+        userAttributeMap.put("urn:mace:dir:attribute-def:eduPersonPrincipalName", "admin.doe@example.com");
         userAttributeMap.put("urn:oid:1.3.6.1.4.1.1076.20.100.10.10.1", "guest");
 
         List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
