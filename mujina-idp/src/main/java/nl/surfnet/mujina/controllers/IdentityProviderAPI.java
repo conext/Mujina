@@ -34,12 +34,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.GrantedAuthorityImpl;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 public class IdentityProviderAPI {
@@ -94,7 +89,25 @@ public class IdentityProviderAPI {
         configuration.getUsers().add(auth);
         Map<String, String> userAttributeMap = configuration.createAttributeMap(user.getName());
         configuration.getAttributeMap().put(user.getName(), userAttributeMap);
+    }
 
+    @RequestMapping(value = { "/users" }, method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseBody
+    public void addUserForm(
+            @RequestParam("username") String username,
+            @RequestParam("password") String password,
+            @RequestParam("roles") String roles) {
+        log.debug("Request to add user {} with password {}", username, password);
+        final List<GrantedAuthority> grants = new ArrayList<GrantedAuthority>();
+        String[] rolesArray = roles.split(",");
+        for (String authority : rolesArray) {
+            grants.add(new GrantedAuthorityImpl(authority));
+        }
+        SimpleAuthentication auth = new SimpleAuthentication(username, password, grants);
+        configuration.getUsers().add(auth);
+        Map<String, String> userAttributeMap = configuration.createAttributeMap(username);
+        configuration.getAttributeMap().put(username, userAttributeMap);
     }
 
     @RequestMapping(value = { "/authmethod" }, method = RequestMethod.PUT)

@@ -21,9 +21,42 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-  <title>Mujina</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Mujina</title>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function(){
+            var request;
+            $("#adduser").submit(function(event){
+                var $form = $(this);
+                var $inputs = $form.find("input");
+                var serializedData = $form.serialize();
+                $inputs.prop("disabled", true);
+                var request = $.ajax({
+                    url: "/api/users",
+                    type: "post",
+                    data: serializedData
+                });
+
+                request.done(function (response, textStatus, jqXHR){
+                    console.log("User added!");
+                    $("#form_result").text("User added!")
+                });
+
+                request.fail(function (jqXHR, textStatus, errorThrown){
+                    console.error("Error occured: " + textStatus, errorThrown);
+                    $("#form_result").text("User could not be added!")
+                });
+
+                request.always(function () {
+                    $inputs.prop("disabled", false);
+                });
+                event.preventDefault();
+            });
+        });
+    </script>
 </head>
+
 <body>
 
 <pre style="front-weight: bold;">
@@ -61,5 +94,15 @@ ___  ___        _  _
 
 <p><sec:authentication property="details"></sec:authentication></p>
 
+<h4>Add user</h4>
+<form action="#" method="POST" id="adduser">
+    Username: <input name="username" type="text" size="50"><br />
+    Password: <input name="password" type="text" size="50"><br />
+    Roles: <input name="roles" type="text" value="ROLE_USER,ROLE_ADMIN" size="50"> <br />
+    <input type="submit" value="Add user">
+</form>
+<div id="form_result"></div>
+
 </body>
+
 </html>
