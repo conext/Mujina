@@ -42,7 +42,7 @@ public class IdpConfigurationImpl extends CommonConfigurationImpl implements Idp
 
     @Override
     public void reset() {
-        authMethod = AuthenticationMethod.Method.ALL;
+        authMethod = AuthenticationMethod.Method.USER;
         entityId = "http://mock-idp";
 
         try {
