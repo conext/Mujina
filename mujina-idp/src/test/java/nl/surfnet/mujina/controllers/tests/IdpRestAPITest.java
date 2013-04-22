@@ -165,8 +165,8 @@ public class IdpRestAPITest {
     }
 
     @Test
-    public void testSetAuthentication() throws IOException, XMLParserException, ServletException, MessageEncodingException,
-            UnmarshallingException {
+    public void testSetAuthentication()
+            throws IOException, XMLParserException, ServletException, MessageEncodingException, UnmarshallingException {
         final Response response = testHelper.doSamlLogin("admin", "secret");
         assertTrue(testHelper.responseHasAttribute("urn:mace:dir:attribute-def:uid", "admin", response));
     }
