@@ -21,8 +21,9 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>Mujina</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>Mujina</title>
+    <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet">
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
     <script type="text/javascript">
         $(document).ready(function(){
@@ -56,7 +57,6 @@
         });
     </script>
 </head>
-
 <body>
 
 <pre style="front-weight: bold;">
@@ -73,26 +73,28 @@ ___  ___        _  _
 
 </pre>
 
-<h1>Identity Provider Admin Page</h1>
+<div class="container">
 
-<h3>This page is secured. You must have the ROLE_ADMIN authority to be here.</h3>
+  <h1>Identity Provider Admin Page</h1>
 
-<a href="index.jsp">unprotected home page</a> <br/>
-<a href="user.jsp">protected user page</a> <br/>
-<a href="j_spring_security_logout">End your session with the Identity Provider</a>
-<i>Does not end your session with theSP</i> <br/>
+  <h3>This page is secured. You must have the ROLE_ADMIN authority to be here.</h3>
 
-<h3>Your current Spring Security Credentials are:</h3>
+  <a href="index.jsp">unprotected home page</a> <br/>
+  <a href="user.jsp">protected user page</a> <br/>
+  <a href="j_spring_security_logout">End your session with the Identity Provider</a>
+  <i>Does not end your session with theSP</i> <br/>
 
-<H4>Authentication Principal is: </H4>
+  <h3>Your current Spring Security Credentials are:</h3>
 
-<p><sec:authentication property="principal"></sec:authentication></p>
-<H4>Authentication Credentials are: </H4>
+  <H4>Authentication Principal is: </H4>
 
-<p><sec:authentication property="credentials"></sec:authentication></p>
-<H4>Authentication Details are: </H4>
+  <p><sec:authentication property="principal"></sec:authentication></p>
+  <H4>Authentication Credentials are: </H4>
 
-<p><sec:authentication property="details"></sec:authentication></p>
+  <p><sec:authentication property="credentials"></sec:authentication></p>
+  <H4>Authentication Details are: </H4>
+
+  <p><sec:authentication property="details"></sec:authentication></p>
 
 <h4>Add user</h4>
 <form action="#" method="POST" id="adduser">
@@ -104,5 +106,4 @@ ___  ___        _  _
 <div id="form_result"></div>
 
 </body>
-
 </html>

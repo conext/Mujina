@@ -23,6 +23,7 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <title>Mujina IdP User Page</title>
+  <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet">
 </head>
 <body>
 
@@ -39,26 +40,30 @@ ___  ___        _  _
           Identity Provider
 </pre>
 
-<h1>Identity Provider User Page</h1>
+<div class="container">
 
-<h3>This page is secured. You must have the ROLE_USER authority to be here.</h3>
+    <h1>Identity Provider User Page</h1>
 
-<a href="index.jsp">unprotected IDP home page</a> <br/>
-<a href="admin.jsp">protected IDP admin page</a> <br/>
-<a href="j_spring_security_logout">End your session with the Identity Provider</a> <i>Does not end your session with the
-  SP</i> <br/>
+    <h3>This page is secured. You must have the ROLE_USER authority to be here.</h3>
 
-<h3>Your current Spring Security Credentials are:</h3>
+    <a href="index.jsp">unprotected IDP home page</a> <br/>
+    <a href="admin.jsp">protected IDP admin page</a> <br/>
+    <a href="j_spring_security_logout">End your session with the Identity Provider</a> <i>Does not end your session with the
+      SP</i> <br/>
 
-<H4>Authentication Principal is: </H4>
+    <h3>Your current Spring Security Credentials are:</h3>
 
-<p><sec:authentication property="principal"></sec:authentication></p>
-<H4>Authentication Credentials are: </H4>
+    <H4>Authentication Principal is: </H4>
 
-<p><sec:authentication property="credentials"></sec:authentication></p>
-<H4>Authentication Details are: </H4>
+    <p><sec:authentication property="principal"></sec:authentication></p>
+    <H4>Authentication Credentials are: </H4>
 
-<p><sec:authentication property="details"></sec:authentication></p>
+    <p><sec:authentication property="credentials"></sec:authentication></p>
+    <H4>Authentication Details are: </H4>
+
+    <p><sec:authentication property="details"></sec:authentication></p>
+
+</div>
 
 </body>
 </html>

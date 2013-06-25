@@ -23,6 +23,7 @@
 <html>
 <head>
   <title>Mujina Login Page</title>
+  <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet">
 </head>
 <body onload='document.login.j_username.focus();'>
 
@@ -39,28 +40,27 @@ ___  ___        _  _
           Identity Provider
 </pre>
 
-<c:if test="${not empty SPRING_SECURITY_LAST_EXCEPTION }">
-  <p><font color='red'>Your login attempt was not successful, try again.<br/><br/>Reason: <c:out
-      value="${SPRING_SECURITY_LAST_EXCEPTION.message}"/></font></p>
-</c:if>
+<div class="container">
 
-<h3>Login with Username and Password</h3>
+  <c:if test="${not empty SPRING_SECURITY_LAST_EXCEPTION }">
+    <p><font color='red'>Your login attempt was not successful, try again.<br/><br/>Reason: <c:out
+        value="${SPRING_SECURITY_LAST_EXCEPTION.message}"/></font></p>
+  </c:if>
 
-<form name='login' action='j_spring_security_check' method='POST'>
-  <table>
-    <tr>
-      <td>User:</td>
-      <td><input type='text' name='j_username' value=''></td>
-    </tr>
-    <tr>
-      <td>Password:</td>
-      <td><input type='password' name='j_password'/></td>
-    </tr>
-    <tr>
-      <td colspan='2'><input name="submit" type="submit" value="Login"/></td>
-    </tr>
-  </table>
+  <h3>Login with Username and Password</h3>
 
-</form>
+  <form name='login' action='j_spring_security_check' method='POST' class='form-horizontal'>
+
+        <label for='j_username'>User:</label>
+        <input type='text' name='j_username' id='j_username' value=''>
+
+        <label for='j_password'>Password:</label>
+        <input type='password' name='j_password' id='j_password'/>
+
+        <input name="submit" type="submit" value="Login" class="btn btn-success"/>
+
+  </form>
+
+</div>
 </body>
 </html>
